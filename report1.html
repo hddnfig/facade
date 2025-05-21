@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>대한민국 미디어 설치 전문업체 분석</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Visualization & Content Choices: 
+        - Overall Comparison: Interactive HTML table (Sort/Filter) -> Goal: Compare -> Method: HTML + JS -> Interaction: Click headers to sort (future), select filter -> Justification: Efficiently scan/narrow options.
+        - Company Profiles: Structured text -> Goal: Inform -> Method: HTML -> Interaction: Select from table/dropdown -> Justification: Clear detailed vendor info.
+        - Specialization Analysis: Bar Chart (Chart.js) -> Goal: Understand market landscape -> Method: Chart.js Canvas -> Interaction: Hover for tooltips -> Justification: Visual overview of service concentrations.
+        - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. 
+    -->
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .content-section { display: none; }
+        .content-section.active { display: block; }
+        @media (prefers-color-scheme: dark) {
+            body { background-color: #1f2937; color: #f3f4f6; }
+            .bg-slate-50 { background-color: #374151; }
+            .text-slate-800 { color: #f3f4f6; }
+            .text-slate-600 { color: #d1d5db; }
+            .bg-white { background-color: #4b5563; }
+            .border-gray-200 { border-color: #4b5563; }
+            .hover\:bg-slate-100:hover { background-color: #4b5563; }
+            .ring-slate-300 { ring-color: #6b7280; }
+            th, td { border-color: #4b5563 !important; }
+            .chart-container {
+                position: relative;
+                width: 100%;
+                max-width: 800px;
+                margin-left: auto;
+                margin-right: auto;
+                height: 400px;
+                max-height: 50vh;
+            }
+             select, input[type="text"] {
+                background-color: #4B5563;
+                color: #F3F4F6;
+                border-color: #6B7280;
+            }
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px; /* Adjusted for better viewing on larger screens */
+            margin-left: auto;
+            margin-right: auto;
+            height: 400px; /* Base height */
+            max-height: 50vh; /* Max height relative to viewport */
+        }
+        @media (max-width: 768px) {
+            .chart-container {
+                height: 300px; /* Smaller height for mobile */
+                max-height: 60vh;
+            }
+        }
+        .tab-button {
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .tab-button.active {
+            background-color: #0284c7; /* sky-600 */
+            color: white;
+        }
+        .tab-button:not(.active):hover {
+            background-color: #e2e8f0; /* slate-200 */
+        }
+         @media (prefers-color-scheme: dark) {
+            .tab-button:not(.active):hover {
+                background-color: #4b5563; /* gray-600 for dark mode hover */
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased">
+    <div class="container mx-auto p-4 md:p-8">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-sky-700 mb-2">대한민국 미디어 설치 전문업체 분석</h1>
+            <p class="text-slate-600 text-md md:text-lg">미디어파사드, 공공 미디어보드, 프로젝션 맵핑 시공/설치 업체 정보</p>
+        </header>
+
+        <nav class="mb-8 flex flex-wrap justify-center gap-2">
+            <button data-tab="intro" class="tab-button active text-sm md:text-base font-medium py-2 px-4 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50">소개 및 사용법</button>
+            <button data-tab="comparison" class="tab-button text-sm md:text-base font-medium py-2 px-4 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50">종합 비교</button>
+            <button data-tab="companyDetails" class="tab-button text-sm md:text-base font-medium py-2 px-4 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50">업체 상세 정보</button>
+            <button data-tab="specializationAnalysis" class="tab-button text-sm md:text-base font-medium py-2 px-4 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50">전문 분야 분석</button>
+            <button data-tab="evaluationCriteria" class="tab-button text-sm md:text-base font-medium py-2 px-4 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50">주요 평가 기준</button>
+            <button data-tab="conclusion" class="tab-button text-sm md:text-base font-medium py-2 px-4 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50">결론 및 제언</button>
+        </nav>
+
+        <main>
+            <section id="intro" class="content-section active bg-white p-6 rounded-lg shadow-lg">
+                <h2 class="text-2xl font-semibold text-sky-700 mb-4">애플리케이션 소개</h2>
+                <p class="mb-3 text-slate-700">본 애플리케이션은 "대한민국 미디어파사드, 공공 시설 미디어보드, 프로젝션 맵핑 시공/설치 전문업체 분석 보고서"의 내용을 기반으로 제작된 대화형 웹 애플리케이션입니다. 사용자는 이 도구를 통해 보고서에 수록된 다양한 업체 정보를 손쉽게 탐색하고 비교 분석할 수 있습니다.</p>
+                <p class="mb-3 text-slate-700">상단 탭 메뉴를 사용하여 원하는 정보 섹션으로 이동할 수 있습니다:</p>
+                <ul class="list-disc list-inside space-y-1 text-slate-700 mb-4">
+                    <li><strong>종합 비교:</strong> 여러 업체의 주요 정보를 표 형태로 비교하고, 필터링 기능을 통해 원하는 조건의 업체를 찾아볼 수 있습니다. 업체명을 클릭하면 상세 정보로 이동합니다.</li>
+                    <li><strong>업체 상세 정보:</strong> '종합 비교' 탭에서 업체를 선택하거나, 여기서 직접 업체를 선택하여 각 기업의 개요, 핵심 서비스, 주요 프로젝트, 안정성 및 신뢰성 지표, 연락처 등 상세 정보를 확인할 수 있습니다.</li>
+                    <li><strong>전문 분야 분석:</strong> 보고서에 언급된 기업들의 주요 전문 분야 분포를 시각화된 차트로 제공하여 시장 동향을 파악하는 데 도움을 줍니다.</li>
+                    <li><strong>주요 평가 기준:</strong> 보고서에서 기업을 평가한 기준(안정성, 신뢰성, 실행 능력)에 대한 설명을 제공합니다.</li>
+                    <li><strong>결론 및 제언:</strong> 보고서의 최종 요약 및 사용자 제언 사항을 확인할 수 있습니다.</li>
+                </ul>
+                <p class="text-slate-700">이 애플리케이션을 통해 복잡한 업체 정보를 보다 효율적으로 파악하고, 프로젝트에 적합한 파트너를 선정하는 데 유용한 정보를 얻으시길 바랍니다.</p>
+            </section>
+
+            <section id="comparison" class="content-section bg-white p-6 rounded-lg shadow-lg">
+                <h2 class="text-2xl font-semibold text-sky-700 mb-4">업체 종합 비교</h2>
+                <p class="mb-4 text-slate-700">아래 표는 보고서에 언급된 주요 미디어 설치 업체들의 핵심 정보를 요약하여 비교한 것입니다. '전문 분야 필터'를 사용하여 특정 서비스 분야의 업체를 찾아보거나, 표의 헤더를 클릭하여 정렬할 수 있습니다. 업체명을 클릭하면 해당 업체의 상세 정보 페이지로 이동합니다.</p>
+                <div class="mb-4">
+                    <label for="specializationFilter" class="block text-sm font-medium text-slate-700 mb-1">전문 분야 필터:</label>
+                    <select id="specializationFilter" class="w-full md:w-1/3 p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500">
+                        <option value="all">전체 보기</option>
+                    </select>
+                </div>
+                <div class="overflow-x-auto">
+                    <table id="comparisonTable" class="min-w-full divide-y divide-gray-200 border border-gray-200">
+                        <thead class="bg-slate-100">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider cursor-pointer">회사명</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider cursor-pointer">설립연도/주요 현황</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">주요 전문 분야</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">주요 신뢰성 지표</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">주요 서비스 지역/센터</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="companyDetails" class="content-section bg-white p-6 rounded-lg shadow-lg">
+                <h2 class="text-2xl font-semibold text-sky-700 mb-4">업체 상세 정보</h2>
+                <p class="mb-4 text-slate-700">'종합 비교' 탭에서 업체를 클릭했거나 아래 드롭다운에서 업체를 선택하면 해당 기업의 상세 정보를 확인할 수 있습니다. 보고서에 기초한 기업 개요, 핵심 서비스, 주요 프로젝트 이력, 안정성 및 신뢰성 관련 지표, 연락처 정보 등을 제공합니다.</p>
+                <div class="mb-6">
+                    <label for="companySelect" class="block text-sm font-medium text-slate-700 mb-1">업체 선택:</label>
+                    <select id="companySelect" class="w-full md:w-1/2 p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500">
+                        <option value="">-- 업체 선택 --</option>
+                    </select>
+                </div>
+                <div id="companyDetailContent" class="space-y-6">
+                    <p class="text-slate-600">업체를 선택해주세요.</p>
+                </div>
+            </section>
+
+            <section id="specializationAnalysis" class="content-section bg-white p-6 rounded-lg shadow-lg">
+                <h2 class="text-2xl font-semibold text-sky-700 mb-4">전문 분야 분석</h2>
+                <p class="mb-6 text-slate-700">이 섹션에서는 보고서에 언급된 주요 기업들의 전문 분야 분포를 시각적으로 분석합니다. 아래 차트는 각 전문 분야별로 활동하는 기업의 수를 보여주어, 국내 미디어 설치 시장의 기술 및 서비스 집중도를 파악하는 데 도움을 줄 수 있습니다. 차트의 각 막대에 마우스를 올리면 정확한 수치를 확인할 수 있습니다.</p>
+                <div class="chart-container">
+                    <canvas id="specializationChart"></canvas>
+                </div>
+            </section>
+
+            <section id="evaluationCriteria" class="content-section bg-white p-6 rounded-lg shadow-lg">
+                <h2 class="text-2xl font-semibold text-sky-700 mb-4">주요 평가 기준</h2>
+                <p class="mb-6 text-slate-700">본 보고서에서 미디어 설치 분야 우수 기업을 정의하고 평가하는 데 사용된 주요 기준은 다음과 같습니다. 이 기준들은 사용자의 요구사항인 안정성, 신뢰성, 그리고 검증된 전문성을 반영하여 객관적인 기업 선정을 돕고자 마련되었습니다.</p>
+                <div class="space-y-4">
+                    <div>
+                        <button data-accordion="stability" class="accordion-button w-full text-left p-3 bg-slate-100 hover:bg-slate-200 rounded-md font-medium focus:outline-none">
+                            A. 안정성 및 운영 건전성
+                        </button>
+                        <div id="stabilityContent" class="accordion-content hidden mt-2 p-3 bg-slate-50 rounded-md border">
+                            <ul class="list-disc list-inside space-y-2 text-slate-700">
+                                <li><strong>운영 기간 및 지속적인 시장 활동:</strong> 장기간 안정적으로 시장에서 활동해 온 기업.</li>
+                                <li><strong>기업 구조 및 자원:</strong> 사내 전문 인력 보유 및 전담 부서 운영 등.</li>
+                                <li><strong>인증 및 공식 인정:</strong> ISO 인증, 정부 지원 벤처기업 인증, 주요 제조사 기술 인증 등.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div>
+                        <button data-accordion="reliability" class="accordion-button w-full text-left p-3 bg-slate-100 hover:bg-slate-200 rounded-md font-medium focus:outline-none">
+                            B. 신뢰성 및 신용도
+                        </button>
+                        <div id="reliabilityContent" class="accordion-content hidden mt-2 p-3 bg-slate-50 rounded-md border">
+                            <ul class="list-disc list-inside space-y-2 text-slate-700">
+                                <li><strong>기술 파트너십 및 제휴:</strong> 선도적인 글로벌 기술 제공업체와의 파트너십.</li>
+                                <li><strong>부품 및 시공 품질:</strong> 고품질 자재 사용과 숙련된 설치 기술.</li>
+                                <li><strong>사후 서비스(A/S) 및 유지보수 지원:</strong> 체계적인 A/S 시스템.</li>
+                                <li><strong>고객 평가 및 반복 사업:</strong> (정보가 있는 경우) 장기적인 고객 관계.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div>
+                        <button data-accordion="trackRecord" class="accordion-button w-full text-left p-3 bg-slate-100 hover:bg-slate-200 rounded-md font-medium focus:outline-none">
+                            C. 검증된 실적 및 실행 능력
+                        </button>
+                        <div id="trackRecordContent" class="accordion-content hidden mt-2 p-3 bg-slate-50 rounded-md border">
+                           <ul class="list-disc list-inside space-y-2 text-slate-700">
+                                <li><strong>포트폴리오 다양성 및 규모:</strong> 다양한 유형의 프로젝트와 대규모 구축 성공 경험.</li>
+                                <li><strong>공공 부문 프로젝트 특화 경험:</strong> 정부 기관, 공공 시설, 주요 공공 행사 프로젝트 성공 이력.</li>
+                                <li><strong>기술적 실행(시공/설치) 대 콘텐츠 제작:</strong> 검증된 설치 및 시공 역량.</li>
+                                <li><strong>수행 프로젝트에 대한 수상 및 업계 인정:</strong> 객관적인 성과 지표.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="conclusion" class="content-section bg-white p-6 rounded-lg shadow-lg">
+                <h2 class="text-2xl font-semibold text-sky-700 mb-4">결론 및 제언</h2>
+                <p class="mb-4 text-slate-700">보고서의 상세 프로필 및 비교 분석을 바탕으로, 사용자의 주요 요구사항(안정성, 신뢰성, 검증된 공공 부문/대규모 실행 실적)에 부합하는 기업들에 대한 요약과 사용자 다음 단계를 위한 지침을 제공합니다.</p>
+                
+                <h3 class="text-xl font-semibold text-slate-800 mt-6 mb-3">가장 유망한 공급업체 요약</h3>
+                <ul class="list-disc list-inside space-y-2 text-slate-700 mb-4">
+                    <li><strong>대규모, 예술적, 몰입형 공공 미디어아트 (파사드, 프로젝션 맵핑):</strong> 닷밀, 자이언트스텝</li>
+                    <li><strong>하드웨어 품질 및 A/S 강조 LED 파사드/비디오월:</strong> 메타파사드(주)</li>
+                    <li><strong>공공 시설 통합 디지털 솔루션 (프로젝션 맵핑, XR, 키오스크 등):</strong> (주)에스씨크리에이티브</li>
+                    <li><strong>콘텐츠 제작 중심 프로젝션 맵핑/전시 설치:</strong> 상상연필</li>
+                </ul>
+
+                <h3 class="text-xl font-semibold text-slate-800 mt-6 mb-3">"공공 시설 미디어보드" 관련 제언</h3>
+                <p class="text-slate-700 mb-4">주거용 건물의 표준화된 광고 네트워크는 KT가 선택지가 될 수 있습니다. 그러나 다양한 공공 시설(정부 건물, 문화 센터 등)의 맞춤형 디지털 사이니지, 정보 게시판, 인터랙티브 키오스크의 경우, (주)에스씨크리에이티브, 메타파사드(주), 또는 특정 요구에 따라 닷밀/자이언트스텝과 같은 회사가 더 적합할 수 있습니다.</p>
+
+                <h3 class="text-xl font-semibold text-slate-800 mt-6 mb-3">사용자 다음 단계를 위한 지침</h3>
+                <ul class="list-disc list-inside space-y-2 text-slate-700 mb-4">
+                    <li><strong>프로젝트 범위 명확히 정의:</strong> 설치 유형, 규모, 콘텐츠 요구, 상호작용성, 예산, 일정 등을 구체화합니다.</li>
+                    <li><strong>상세 제안서 및 포트폴리오 요청:</strong> 최종 후보 기업에 연락하여 관련 과거 작업에 대한 상세 자료를 요청합니다.</li>
+                    <li><strong>설치 프로세스 및 유지보수 문의:</strong> 시공 방법론, 프로젝트 관리, 장기 A/S 계획을 확인합니다.</li>
+                    <li><strong>현장 방문 (가능한 경우):</strong> 과거 설치 현장을 방문하여 품질과 내구성을 직접 확인합니다.</li>
+                </ul>
+                <h3 class="text-xl font-semibold text-slate-800 mt-6 mb-3">최종 의견</h3>
+                <p class="text-slate-700">대한민국 미디어 설치 시장은 기술, 창의성, 통합 솔루션 능력을 갖춘 다양한 기업들이 경쟁하고 있습니다. 프로젝트의 특성과 주요 목표(기술, 예술, 상호작용 등)를 명확히 하여 최적의 파트너를 선정하는 것이 중요합니다. 본 보고서와 애플리케이션이 성공적인 프로젝트 수행에 도움이 되기를 바랍니다.</p>
+            </section>
+        </main>
+
+        <footer class="text-center mt-12 py-4 border-t border-gray-200">
+            <p class="text-sm text-slate-500">&copy; 2024 대한민국 미디어 설치 전문업체 분석. 정보 출처: 제공된 분석 보고서.</p>
+        </footer>
+    </div>
+
+    <script>
+        const companiesData = [
+            {
+                id: "sccreative",
+                name: "(주)에스씨크리에이티브",
+                established: "2020년",
+                status: "벤처기업, 강소기업, 이노비즈 인증 등 다수",
+                specializations: ["미디어파사드", "프로젝션 맵핑", "XR 솔루션", "공공 키오스크/사이니지", "AI 시스템"],
+                reliabilityIndicators: "다수 정부 인증 및 수상, 공공기관 프로젝트 다수, 특허 보유",
+                serviceArea: "전국 (특히 전남지역 프로젝트 다수)",
+                overview: "2020년에 설립된 기술 벤처 기업. AR/XR 실감 미디어, AI 카메라 시스템, 미디어파사드/프로젝션 맵핑, 3D 디자인, 영상 제작, 앱/키오스크 개발 등 다양한 분야 전문. '상상을 현실로 만드는 기술' 추구.",
+                coreServices: [
+                    "미디어파사드 / 프로젝션 맵핑: 멀티빔 프로젝션을 통한 실내 프로젝션 맵핑 및 옥외 미디어파사드 미디어아트 전시. 강진 다산박물관 등.",
+                    "공공 미디어보드 (키오스크/디지털 사이니지 통해 유추): 순천만국가정원 AR 앱, 여수 돌산 갓김치 체험장 키오스크 등 공공 및 정보 제공 목적 앱/키오스크 개발."
+                ],
+                keyProjects: [
+                    "광주시립미술관 어린이갤러리: 프로젝션 맵핑 및 인터랙티브 XR 콘텐츠 제작.",
+                    "순천만 자연생태관: 체험형 XR 어트랙션 설치.",
+                    "전남도립미술관: 빔 프로젝터와 홀로렌즈 활용 실감 미디어 콘텐츠 전시.",
+                    "여수 금오도 여가캠핑장: '금오도 판타지' 야간 미디어파사드 구축.",
+                    "고흥 G갤러리: 조형물 통합 미디어파사드 콘텐츠 전시.",
+                    "강진 다산박물관: 멀티빔 프로젝션 활용 미디어 전시 공간 디자인.",
+                    "지리산역사문학관: 공공 박물관 외벽 맵핑(미디어파사드)."
+                ],
+                reliabilityDetail: "벤처기업 인증, 기업 창작 전담부서 인증, 종합산업디자인전문회사 인증, 국방벤처기업 인증, K-Data 데이터바우처 가공기업 인증, 일자리 우수기업 선정, 강소기업 선정, 기술혁신형 이노비즈 인증, 산업자원부 장관 표창. 다수 특허 보유. 2024 창업기업 실증 경진대회 대상 수상. 주요 고객: 다수 공공 박물관, 미술관, 지방 정부 지원 관광지.",
+                contact: "전화: 061-811-2223, 이메일: tommy@sccreative.kr, 주소: 전라남도 순천시 중앙로 255."
+            },
+            {
+                id: "metafacade",
+                name: "메타파사드(주)",
+                established: "2022년",
+                status: "Leyard & Unilumin 공식 기술 인증",
+                specializations: ["LED 미디어파사드", "LED 비디오월", "디지털 사이니지"],
+                reliabilityIndicators: "글로벌 Top2 LED 제조사 동시 인증, 자체 A/S망(서울, 부산, 대구), 고품질 부품 사용 강조",
+                serviceArea: "전국 (서울, 부산, 대구 A/S 센터)",
+                overview: "미디어파사드, LED 비디오월, 미디어아트, 디지털 사이니지 전문 대형 디스플레이 기업. 글로벌 LED 브랜드 Leyard와 Unilumin 동시 기술 인증 국내 유일 기업. 장기적 품질과 신뢰성 위해 최상위 LED 반도체 사용 강조.",
+                coreServices: [
+                    "미디어파사드 및 LED 비디오월 설치: 주요 사업 분야. 대형 디스플레이 설계 및 구축.",
+                    "디지털 사이니지: 공공 시설 미디어보드와 관련성 높음."
+                ],
+                keyProjects: [
+                    "보타닉파크웨딩(서울)", "갈마감리교회(대전)", "마가의 다락방 기도원(인천)", 
+                    "영락의료과학고(서울)", "우리지구촌교회(이천)", "내곡느티나무쉼터(서울) - 공공시설 추정"
+                ],
+                reliabilityDetail: "Leyard 및 Unilumin 공식 한국 기술 인증. 10년 이상 경력 기술자 보유, Leyard 및 Unilumin 인증 설치 전문가 팀 'Team PARAMETA' 운영 및 본사 정기 교육 이수. 서울, 부산, 대구 직영 A/S 센터 운영.",
+                contact: "서울 사무소: 서울특별시 중랑구 신내역로 111 SK V1센터 A동 721호, 전화: 02-6489-0110, 이메일: metafacadeled@gmail.com."
+            },
+            {
+                id: "dotmill",
+                name: "닷밀",
+                established: "2015년경 (추정)",
+                status: "신용보증기금 '혁신아이콘' 선정",
+                specializations: ["대규모 미디어아트", "프로젝션 맵핑", "몰입형 테마파크"],
+                reliabilityIndicators: "성공적인 B2G 실적 (계약 건수 급증), 흑자 경영 및 투자 유치, 국제적 프로젝트 참여",
+                serviceArea: "국내 주요 도시 및 해외 (테마파크 라이선싱 확장 계획)",
+                overview: "대한민국 대표 '실감미디어 기업'. 대형 미디어아트, 대규모 이벤트 제작, 디지털 테마파크 조성으로 유명. 슬로건: 'Be Mystic, 세상을 더욱 신비롭게'. 평창 동계올림픽 개폐회식 등 프로젝트로 명성. IPO 기술성 평가 'A' 등급.",
+                coreServices: [
+                    "미디어아트 및 프로젝션 맵핑: 핵심 강점. 프로젝션 맵핑, 미디어파사드, 홀로그램, 아나모픽, 몰입형 환경 구축 전문.",
+                    "공공 시설 미디어 설치: 미디어아트 프로젝트 위한 '시설 구축' 경험. 다수 도시 '나이트워크' 어트랙션 조성."
+                ],
+                keyProjects: [
+                    "평창 동계올림픽 개폐회식", "DDP 서울라이트", "통영 디피랑 (B2G 성공사례, 야간 디지털 테마파크)",
+                    "제주 루나폴 (대규모 야외 디지털 테마파크)", 
+                    "나이트워크 프로젝트: 광주 금남나비정원, 울주 명선도, 하동 화개빛터, 공주 공산성 백제 연화 등",
+                    "두바이 부르즈 할리파 미디어파사드", "미국 '스피어(Sphere)' 콘텐츠 제작 참여"
+                ],
+                reliabilityDetail: "검증된 B2G 실적 ('디피랑' 성공 후 B2G 계약 급증). 성공적인 프리IPO 투자 유치, 흑자 경영 보고, 매출 성장. 몰입형 미디어 기술(MR, 홀로그램, 프로젝션 맵핑) 선도.",
+                contact: "본사: 서울특별시 마포구 동교로41길 41. 웹사이트: dotmill.com."
+            },
+            {
+                id: "giantstep",
+                name: "자이언트스텝",
+                established: "2008년",
+                status: "코스닥 상장",
+                specializations: ["VFX", "실감형 콘텐츠", "뉴미디어 (미디어파사드, XR)", "버추얼 프로덕션"],
+                reliabilityIndicators: "코스닥 상장사, 레드닷 디자인 어워드 등 수상, 대규모 국제 행사 참여",
+                serviceArea: "전국 및 해외 (LA 지사 운영)",
+                overview: "2008년 설립된 콘텐츠 솔루션 기업. VFX, AI 기반 버추얼 휴먼, 실시간 XR 콘텐츠, 몰입형 콘텐츠 제작 전문. 코스닥 상장.",
+                coreServices: [
+                    "뉴미디어 / 실시간 콘텐츠: 미디어파사드, 센서 기반 설치, 다면 스크린 등 몰입형 경험.",
+                    "프로젝션 맵핑: 미디어아트 및 뉴미디어 프로젝트 통해 시사."
+                ],
+                keyProjects: [
+                    "서울라이트 DDP (2022년 메인 아티스트, '우주적 삶' 미디어아트 제작, 레드닷 디자인 어워드 수상)",
+                    "2025 오사카·간사이 엑스포 한국관 (홍보 콘텐츠 총괄, 외부 파사드 및 내부 로비 미디어아트 제작)",
+                    "서울라이트 광화문 (미디어아트 전시)"
+                ],
+                reliabilityDetail: "2008년 설립, 코스닥 상장으로 재무 투명성 및 안정성 시사. VFX, 실시간 엔진, 버추얼 프로덕션, AI 분야 기술력 보유. 서울라이트 DDP 프로젝트 참여로 레드닷 디자인 어워드 수상, 2024 앤어워드 그랑프리 수상.",
+                contact: "웹사이트: giantstep.co.kr. 주요 연락처 (개인정보보호책임자 통해 유추): 오해숙 총무이사 02-549-0005."
+            },
+            {
+                id: "sangsangpencil",
+                name: "상상연필",
+                established: "다년간 운영",
+                status: "(정확한 설립연도 미확인)",
+                specializations: ["영상 제작", "미디어파사드 콘텐츠", "전시장 시공", "프로젝션 맵핑"],
+                reliabilityIndicators: "2,000여 개 미디어파사드 콘텐츠 보유, 주요 기업 및 기관과의 장기 협력 관계",
+                serviceArea: "대구 기반, 전국 서비스 가능",
+                overview: "미디어파사드 및 각종 영상물 제작 분야 '다년간의 경험' 보유 종합 영상 제작 기업. 미디어파사드 콘텐츠, 기관/기업 홍보 영상, 옥외 광고 영상, 전시장 시공, 콘텐츠 공급 등 서비스. '2,000여개의 미디어파사드 콘텐츠' 라이브러리 보유.",
+                coreServices: [
+                    "미디어파사드 및 전시장 설치: '미디어파사드 & 전시장 시공 및 콘텐츠 제작', '미디어파사드 상시 설치'.",
+                    "프로젝션 맵핑: 미디어파사드 서비스 및 콘텐츠 제작 통해 시사."
+                ],
+                keyProjects: [
+                    "KT&G 천안공장 매뉴얼 영상 제작 (70편 이상)",
+                    "한국환경공단 매뉴얼 영상 제작 (30편)",
+                    "파르나스 호텔 및 파라다이스 호텔 아트파라디소 (미디어파사드 목업/예시 영상 제공)",
+                    "제주도 프로젝트 (가로 6.4m x 세로 4m 공간 및 바닥면 가로 6.4m x 세로 11m 규모 프로젝터 4대 구현 - 프로젝션 맵핑 설치 사례)",
+                    "신라공업고등학교 홍보영상 제작"
+                ],
+                reliabilityDetail: "'다년간의 경험'. 2,000개 이상 미디어파사드 콘텐츠 보유. 주요 고객: KT&G, 한국환경공단, 현대로보틱스, 영천농협, 대구테크노파크. 맞춤형 제작, 신속/정확 서비스, 고객 만족 강조.",
+                contact: "전화: 010-4292-1999. 주소: 대구광역시 수성구 범어동 773-8 1층 상상연필."
+            },
+             {
+                id: "kt",
+                name: "KT / 광고하는친구들",
+                established: "KT: 대기업",
+                status: "KTis (자회사) / (주)광고하는친구들 운영",
+                specializations: ["미디어보드 (엘리베이터 광고 네트워크)"],
+                reliabilityIndicators: "KT: 주요 통신 대기업으로 높은 안정성, 대규모 네트워크 운영",
+                serviceArea: "전국 (아파트 단지 중심)",
+                overview: "KT 타운보드(KTis 운영) 및 IMP 보드((주)광고하는친구들 제공)는 전국 아파트 엘리베이터에 광고용 모니터를 설치 및 운영하는 서비스입니다. 이는 (준)공공 장소에 미디어보드를 설치하는 작업을 포함하나, 주 사업 모델은 광고 네트워크 운영입니다.",
+                coreServices: [
+                    "KT 타운보드: 전국 아파트 엘리베이터 약 35,000개 광고 모니터 설치 운영.",
+                    "IMP 보드: 전국 아파트 엘리베이터 약 11,200대 광고 모니터 설치 운영."
+                ],
+                keyProjects: [
+                    "전국 다수 아파트 단지 엘리베이터 광고 모니터 설치 및 운영"
+                ],
+                reliabilityDetail: "KT는 주요 통신 대기업으로 높은 안정성을 시사합니다. 대규모 네트워크 크기는 광범위한 설치 및 유지보수 역량을 나타냅니다. 다만, 서비스는 엘리베이터 광고에 특화되어 있어, 맞춤형 공공 시설 디지털 사이니지/미디어보드 설계 및 설치와는 차이가 있을 수 있습니다.",
+                contact: "KT 고객센터 또는 각 서비스별 문의처 확인 필요."
+            }
+        ];
+
+        let specializationChartInstance = null; // Store chart instance
+
+        const allSpecializations = companiesData.reduce((acc, company) => {
+            company.specializations.forEach(spec => {
+                if (!acc.includes(spec)) {
+                    acc.push(spec);
+                }
+            });
+            return acc;
+        }, []).sort();
+        
+        function populateSpecializationFilter() {
+            const filterSelect = document.getElementById('specializationFilter');
+            allSpecializations.forEach(spec => {
+                const option = document.createElement('option');
+                option.value = spec;
+                option.textContent = spec;
+                filterSelect.appendChild(option);
+            });
+        }
+
+        function populateComparisonTable(filter = "all") {
+            const tableBody = document.getElementById('comparisonTable').getElementsByTagName('tbody')[0];
+            tableBody.innerHTML = ""; 
+
+            const filteredCompanies = companiesData.filter(company => 
+                filter === "all" || company.specializations.includes(filter)
+            );
+
+            filteredCompanies.forEach(company => {
+                let row = tableBody.insertRow();
+                row.insertCell().innerHTML = `<a href="#" data-companyid="${company.id}" class="text-sky-600 hover:text-sky-800 font-semibold company-link">${company.name}</a>`;
+                row.insertCell().textContent = `${company.established} / ${company.status}`;
+                row.insertCell().textContent = company.specializations.join(', ');
+                row.insertCell().textContent = company.reliabilityIndicators;
+                row.insertCell().textContent = company.serviceArea;
+            });
+            addCompanyLinkListeners();
+        }
+        
+        function addCompanyLinkListeners() {
+            document.querySelectorAll('.company-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const companyId = this.dataset.companyid;
+                    displayCompanyDetails(companyId);
+                    document.querySelector(`button[data-tab="companyDetails"]`).click();
+                    document.getElementById('companySelect').value = companyId;
+                });
+            });
+        }
+
+
+        function populateCompanySelect() {
+            const select = document.getElementById('companySelect');
+            companiesData.forEach(company => {
+                const option = document.createElement('option');
+                option.value = company.id;
+                option.textContent = company.name;
+                select.appendChild(option);
+            });
+        }
+
+        function displayCompanyDetails(companyId) {
+            const contentDiv = document.getElementById('companyDetailContent');
+            const company = companiesData.find(c => c.id === companyId);
+
+            if (company) {
+                contentDiv.innerHTML = `
+                    <article class="border border-gray-200 p-4 rounded-lg">
+                        <h3 class="text-xl font-bold text-sky-700 mb-3">${company.name}</h3>
+                        <p class="mb-2"><strong>설립연도/주요 현황:</strong> ${company.established} / ${company.status}</p>
+                        <p class="mb-4"><strong>개요:</strong> ${company.overview}</p>
+                        
+                        <h4 class="text-lg font-semibold text-slate-800 mt-4 mb-2">핵심 서비스:</h4>
+                        <ul class="list-disc list-inside space-y-1 ml-4 mb-4 text-slate-700">
+                            ${company.coreServices.map(service => `<li>${service}</li>`).join('')}
+                        </ul>
+                        
+                        <h4 class="text-lg font-semibold text-slate-800 mt-4 mb-2">주요 프로젝트 실행 이력:</h4>
+                        <ul class="list-disc list-inside space-y-1 ml-4 mb-4 text-slate-700">
+                            ${company.keyProjects.map(project => `<li>${project}</li>`).join('')}
+                        </ul>
+
+                        <h4 class="text-lg font-semibold text-slate-800 mt-4 mb-2">안정성 및 신뢰성 지표:</h4>
+                        <p class="mb-4 text-slate-700">${company.reliabilityDetail}</p>
+
+                        <h4 class="text-lg font-semibold text-slate-800 mt-4 mb-2">연락처:</h4>
+                        <p class="text-slate-700">${company.contact}</p>
+                    </article>
+                `;
+            } else {
+                contentDiv.innerHTML = '<p class="text-slate-600">해당 업체의 정보를 찾을 수 없습니다.</p>';
+            }
+        }
+
+        function renderSpecializationChart() {
+            const canvas = document.getElementById('specializationChart');
+            if (!canvas) return; // Exit if canvas not found
+            const ctx = canvas.getContext('2d');
+            
+            if (specializationChartInstance) {
+                specializationChartInstance.destroy(); // Destroy existing chart instance
+            }
+
+            const specializationCounts = {};
+            allSpecializations.forEach(spec => specializationCounts[spec] = 0);
+
+            companiesData.forEach(company => {
+                company.specializations.forEach(spec => {
+                    if (specializationCounts.hasOwnProperty(spec)) {
+                        specializationCounts[spec]++;
+                    }
+                });
+            });
+            
+            const sortedSpecializations = Object.entries(specializationCounts)
+                .sort(([,a],[,b]) => b-a)
+                .reduce((r, [k, v]) => ({ ...r, [k]: v }), {});
+
+            specializationChartInstance = new Chart(ctx, { // Assign new chart to instance variable
+                type: 'bar',
+                data: {
+                    labels: Object.keys(sortedSpecializations),
+                    datasets: [{
+                        label: '전문 분야별 업체 수',
+                        data: Object.values(sortedSpecializations),
+                        backgroundColor: 'rgba(56, 189, 248, 0.6)', 
+                        borderColor: 'rgba(2, 132, 199, 1)', 
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                callback: function(value, index, values) {
+                                    const label = this.getLabelForValue(value);
+                                    return label.length > 10 ? label.substring(0,10) + '...' : label;
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += context.parsed.y + '개 업체';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabs = document.querySelectorAll('.tab-button');
+            const sections = document.querySelectorAll('.content-section');
+            const accordionButtons = document.querySelectorAll('.accordion-button');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const targetSectionId = this.dataset.tab;
+                    sections.forEach(section => {
+                        if (section.id === targetSectionId) {
+                            section.classList.add('active');
+                        } else {
+                            section.classList.remove('active');
+                        }
+                    });
+                    if (targetSectionId === 'specializationAnalysis') {
+                        renderSpecializationChart();
+                    }
+                });
+            });
+            
+            accordionButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const contentId = this.dataset.accordion + 'Content';
+                    const content = document.getElementById(contentId);
+                    content.classList.toggle('hidden');
+                });
+            });
+
+            populateSpecializationFilter();
+            populateComparisonTable();
+            populateCompanySelect();
+
+            document.getElementById('specializationFilter').addEventListener('change', function() {
+                populateComparisonTable(this.value);
+            });
+            
+            document.getElementById('companySelect').addEventListener('change', function() {
+                if (this.value) {
+                    displayCompanyDetails(this.value);
+                } else {
+                    document.getElementById('companyDetailContent').innerHTML = '<p class="text-slate-600">업체를 선택해주세요.</p>';
+                }
+            });
+            
+            document.querySelector('button[data-tab="intro"]').click();
+        });
+
+    </script>
+</body>
+</html>
